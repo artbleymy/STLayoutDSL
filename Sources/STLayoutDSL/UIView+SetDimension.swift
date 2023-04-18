@@ -10,10 +10,25 @@ import UIKit
 public extension UIView {
     
     enum Dimension {
-        case width(CGFloat = 0)
-        case height(CGFloat = 0)
+        case width(CGFloat = 1)
+        case height(CGFloat = 1)
     }
     
+    /// Set dimension constraint
+    ///
+    /// To setup size in points
+    /// ```
+    /// subview.setDimension([.height(70), .width(50)])
+    /// ```
+    /// To setup size as multiplier for other view dimension
+    /// ```
+    /// subview.setDimension([.height(1), .width(2)], to: view)
+    /// ```
+    ///
+    /// - Parameter dimensions: array of dimensions for set. Possible values: `.height()`, `.width()`
+    /// Assosiated value is the size or multiplier(if relations with other view needed)
+    /// - Parameter view: to set multiplier between different views dimensions
+    /// - Returns: Current pinned view
     @discardableResult
     func setDimension(
         _ dimensions: [Dimension],
@@ -43,6 +58,10 @@ public extension UIView {
         return self
     }
     
+    /// Set square dimension constraint
+    ///
+    /// - Parameter square: square side size
+    /// - Returns: Current pinned view
     @discardableResult
     func setDimension(
         square: CGFloat

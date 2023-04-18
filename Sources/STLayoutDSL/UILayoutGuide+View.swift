@@ -7,7 +7,7 @@
 
 import UIKit
 
-public extension UILayoutGuide {
+extension UILayoutGuide {
     func view(superview: UIView) -> UIView {
         let view = UIView()
         superview.addSubview(view)

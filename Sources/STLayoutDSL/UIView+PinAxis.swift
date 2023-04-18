@@ -14,6 +14,11 @@ public extension UIView {
         case horizontal(CGFloat = 0)
     }
     
+    /// Pin axes of current view to the target view
+    /// - Parameters:
+    ///   - view: target view
+    ///   - axes: array of axes that should be pinned to targe view. Possible values: `.vertical()`, `.horizontal()`
+    /// - Returns: current pinned view
     @discardableResult
     func pinAxesTo(
         _ view: UIView,
@@ -34,6 +39,13 @@ public extension UIView {
         return self
     }
     
+    /// Pin axes of current view to the superview
+    /// 
+    /// - Parameters:
+    ///   - axes: array of axes that should be pinned to targe view. Possible values: `.vertical()`, `.horizontal()`
+    /// - Returns: current pinned view
+    /// - Throws: Can throw Fatal error  if there are no superview
+    ///
     @discardableResult
     func pinAxesToSuperview(
         _ axes: [Axis] = [.horizontal(), .vertical()]
