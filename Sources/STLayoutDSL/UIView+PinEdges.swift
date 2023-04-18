@@ -36,6 +36,21 @@ public extension UIView {
         case bottom
     }
 
+    
+    /// Pin edges of current view to the target view
+    ///
+    /// By default pin edge to the same edge of
+    /// the target view. For example left to left, top to top etc.
+    /// For customizing offset and target edge,
+    /// custom values can be passed in assosiated values.
+    /// ```
+    /// subview.pinEdgesTo(view, [.left(20), .right(20), .top(20, .bottom)])
+    /// ```
+    ///
+    /// - Parameter view: target view
+    /// - Parameter edges: array of edges which should be pinned. Possible values: `left()`, `right()`, `top()`, `bottom()`
+    ///- Returns: Current pinned view
+     
     @discardableResult
     func pinEdgesTo(
         _ view: UIView,
@@ -80,6 +95,19 @@ public extension UIView {
         return self
     }
     
+    /// Pin edges of current view to the superview
+    ///
+    ///   By default pin edge to the same edge of the superview view. For example left to left, top to top etc.
+    ///   For customizing offset and target edge, custom values can be passed in assosiated values.
+    ///
+    /// ```
+    /// subview.pinEdgesToSuperview([.left(20), .right(20), .top(20, .bottom)])
+    /// ```
+    /// 
+    /// - Parameter edges: array of edges which should be pinned. Possible values: `left()`, `right()`, `top()`, `bottom()`
+    /// - Returns: current pinned view
+    /// - Throws: Can throw Fatal error  if  superview not exists
+    ///
     @discardableResult
     func pinEdgesToSuperview(
         _ edges: [Edge] = [.top(), .bottom(), .left(), .right()]
@@ -92,6 +120,18 @@ public extension UIView {
         return self
     }
     
+    /// Pin edges of current view to the superview
+    ///
+    /// By default pin edge to the same edge of the safe area. For example left to left, top to top etc.
+    /// For customizing offset and target edge, custom values can be passed in assosiated values.
+    /// ```
+    /// subview.pinEdgesToSafeArea([.left(20), .right(20), .top(20, .bottom)])
+    /// ```
+    ///
+    /// - Parameter edges: array of edges which should be pinned. Possible values: `left()`, `right()`, `top()`, `bottom()`
+    /// - Returns: current pinned view
+    /// - Throws: Can throw Fatal error  if  superview not exists
+    ///
     @discardableResult
     func pinEdgesToSafeArea(
         _ edges: [Edge] = [.top(), .bottom(), .left(), .right()]
