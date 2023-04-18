@@ -16,7 +16,7 @@ dependencies: [
 ]
 ```
 
-For adding it to your Xcode project: 
+For adding to Xcode project: 
 1. Go to your project settings in Xcode
 2. Select *Package Dependencies* tab
 3. Tap *Plus* button
@@ -25,7 +25,47 @@ For adding it to your Xcode project:
 
 ## Usage
 
+- Pin edges
+```swift
+    let firstSubview = UIView()
+    view.addSubview(firstSubview)
+    firstSubview
+        .pinEdgesToSuperview([.top(), .bottom(), .left(20), .right(20)])
+
+    let secondSubview = UIView()
+    view.addSubview(secondSubview)
+    secondSubview
+        .pinEdgesToSuperview([.top(), .bottom()])
+        .pinEdgesTo(firstSubview, [.left(15), right(15)])
+```
+
+- Pin axes
+```swift
+    let subview = UIView()
+    view.addSubview(subview)
+    subview
+        .pinAxesToSuperview([.horizontal(), .vertical(10)])
+```
+
+- Set size
+```swift
+    let subview = UIView()
+    view.addSubview(subview)
+    subview
+        .setDimension([.height(20), .width(50)])
+```
+
+- Setup multiple relations
+```swift
+    let yellowView = colorView(color: .yellow)
+    view.addSubview(yellowView)
+    yellowView
+        .pinEdgesTo(blueView, edges: [.left(-30), .right(-40)])
+        .setDimension([.height(70)])
+        .pinAxesToSuperview([.horizontal(100)])
+```
+
 ## License
 
-**STLayoutDSL** is released under the Apache 2.0 license. [See LICENSE](https://github.com/artbleymy/STLayoutDSL/blob/main/LICENSE) for details.
+**STLayoutDSL** is released under the Apache license 2.0. [See LICENSE](https://github.com/artbleymy/STLayoutDSL/blob/main/LICENSE) for details.
 
