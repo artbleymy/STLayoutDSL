@@ -8,34 +8,58 @@
 import UIKit
 
 public extension UIView {
-    
-    enum Edge: Hashable {
-        case left(CGFloat = 0, to: EdgeWithoutValue = .left)
-        case right(CGFloat = 0, to: EdgeWithoutValue = .right)
-        case top(CGFloat = 0, to: EdgeWithoutValue = .top)
-        case bottom(CGFloat = 0, to: EdgeWithoutValue = .bottom)
+    /// Pin edges of current view to the target view
+    ///
+    /// By default pin edge to the same edge of
+    /// the target view. For example left to left, top to top etc.
+    /// For customizing offset and target edge,
+    /// custom values can be passed in assosiated values.
+    /// ```
+    /// subview.pinEdgesTo(view, [.init(.leading, offset: 20), .init(.trailing, offset: 20)])
+    /// ```
+    ///
+    /// - Parameter view: target view
+    /// - Parameter edges: array of edges which should be pinned.`
+    ///- Returns: Current pinned view
+    @discardableResult
+    func pinEdges(
+        to view: Anchorable,
+        edges: [EdgeConstraint]
+    ) -> UIView {
+        translatesAutoresizingMaskIntoConstraints = false
         
-        var inverted: Edge {
-            switch self {
-            case let .left(offset, to: targetEdge):
-                return .left(-offset, to: targetEdge)
-            case let .right(offset, to: targetEdge):
-                return .right(-offset, to: targetEdge)
-            case let .top(offset, to: targetEdge):
-                return .top(-offset, to: targetEdge)
-            case let .bottom(offset, to: targetEdge):
-                return .bottom(-offset, to: targetEdge)
+        let constraints = edges.map {
+            switch $0.type {
+            case .top:
+                let targetAnchor = $0.targetType == .bottom ? view.bottomAnchor : view.topAnchor
+                return topAnchor.constraint(
+                    equalTo: targetAnchor,
+                    constant: $0.offset
+                )
+            case .bottom:
+                let targetAnchor = $0.targetType == .top ? view.topAnchor : view.bottomAnchor
+                return bottomAnchor.constraint(
+                    equalTo: targetAnchor,
+                    constant: $0.offset
+                )
+            case .leading:
+                let targetAnchor = $0.targetType == .trailing ? view.trailingAnchor : view.leadingAnchor
+                return leadingAnchor.constraint(
+                    equalTo: targetAnchor,
+                    constant: $0.offset
+                )
+            case .trailing:
+                let targetAnchor = $0.targetType == .leading ? view.leadingAnchor : view.trailingAnchor
+                return trailingAnchor.constraint(
+                    equalTo: targetAnchor,
+                    constant: $0.offset
+                )
             }
         }
+        NSLayoutConstraint.activate(constraints)
+        
+        return self
     }
-    
-    enum EdgeWithoutValue {
-        case left
-        case right
-        case top
-        case bottom
-    }
-
     
     /// Pin edges of current view to the target view
     ///
@@ -44,137 +68,94 @@ public extension UIView {
     /// For customizing offset and target edge,
     /// custom values can be passed in assosiated values.
     /// ```
-    /// subview.pinEdgesTo(view, [.left(20), .right(20), .top(20, .bottom)])
+    /// subview.pinEdgesTo(view, [.init(.leading, offset: 20), .init(.trailing, offset: 20)])
     /// ```
     ///
     /// - Parameter view: target view
-    /// - Parameter edges: array of edges which should be pinned. Possible values: `left()`, `right()`, `top()`, `bottom()`
+    /// - Parameter edgeTypes: array of edges types which should be pinned. Pin all edges by default`
     ///- Returns: Current pinned view
-     
     @discardableResult
-    func pinEdgesTo(
-        _ view: UIView,
-        edges: [Edge] = [.top(), .bottom(), .left(), .right()]
+    func pinEdges(
+        to view: UIView,
+        edgeTypes: [EdgeConstraint.EdgeType] = [.top, .bottom, .leading, .trailing]
     ) -> UIView {
-        translatesAutoresizingMaskIntoConstraints = false
-        
-        let constraints = edges.map {
-            switch $0 {
-            case let .top(offset, targetEdge):
-                let targetAnchor = targetEdge == .bottom ? view.bottomAnchor : view.topAnchor
-                let offset = targetEdge == .bottom ? offset : -offset
-                return topAnchor.constraint(
-                    equalTo: targetAnchor,
-                    constant: offset
-                )
-            case let .bottom(offset, targetEdge):
-                let targetAnchor = targetEdge == .top ? view.topAnchor : view.bottomAnchor
-                let offset = targetEdge == .top ? -offset : offset
-                return bottomAnchor.constraint(
-                    equalTo: targetAnchor,
-                    constant: offset
-                )
-            case let .left(offset, targetEdge):
-                let targetAnchor = targetEdge == .right ? view.trailingAnchor : view.leadingAnchor
-                let offset = targetEdge == .right ? offset : -offset
-                return leadingAnchor.constraint(
-                    equalTo: targetAnchor,
-                    constant: offset
-                )
-            case let .right(offset, targetEdge):
-                let targetAnchor = targetEdge == .left ? view.leadingAnchor : view.trailingAnchor
-                let offset = targetEdge == .left ? -offset : offset
-                return trailingAnchor.constraint(
-                    equalTo: targetAnchor,
-                    constant: offset
-                )
-            }
-        }
-        NSLayoutConstraint.activate(constraints)
-        
-        return self
+        pinEdges(to: view, edges: edgeTypes.map { EdgeConstraint($0) })
     }
     
     /// Pin edges of current view to the superview
     ///
-    ///   By default pin edge to the same edge of the superview view. For example left to left, top to top etc.
-    ///   For customizing offset and target edge, custom values can be passed in assosiated values.
+    /// ```
+    /// subview.pinEdgesToSuperview([.init(.leading, offset: 20), .init(.trailing, offset: 20)])
+    /// ```
     ///
-    /// ```
-    /// subview.pinEdgesToSuperview([.left(20), .right(20), .top(20, .bottom)])
-    /// ```
-    /// 
-    /// - Parameter edges: array of edges which should be pinned. Possible values: `left()`, `right()`, `top()`, `bottom()`
+    /// - Parameter edges: array of edges which should be pinned.`
     /// - Returns: current pinned view
     /// - Throws: Can throw Fatal error  if  superview not exists
     ///
     @discardableResult
     func pinEdgesToSuperview(
-        _ edges: [Edge] = [.top(), .bottom(), .left(), .right()]
+        _ edges: [EdgeConstraint]
     ) -> UIView {
         guard let superview else {
             fatalError("View doesn't have superview")
         }
-        pinEdgesTo(superview, edges: edges.map { $0.inverted })
         
-        return self
+        return pinEdges(to: superview, edges: edges)
     }
     
     /// Pin edges of current view to the superview
     ///
-    /// By default pin edge to the same edge of the safe area. For example left to left, top to top etc.
-    /// For customizing offset and target edge, custom values can be passed in assosiated values.
     /// ```
-    /// subview.pinEdgesToSafeArea([.left(20), .right(20), .top(20, .bottom)])
+    /// subview.pinEdgesToSuperview([.leading, .trailing])
     /// ```
     ///
-    /// - Parameter edges: array of edges which should be pinned. Possible values: `left()`, `right()`, `top()`, `bottom()`
+    /// - Parameter edges: array of edges types which should be pinned.`
+    /// - Returns: current pinned view
+    /// - Throws: Can throw Fatal error  if  superview not exists
+    ///
+    @discardableResult
+    func pinEdgesToSuperview(
+        _ edgeTypes: [EdgeConstraint.EdgeType] = [.leading, .trailing, .top, .bottom]
+    ) -> UIView {
+        pinEdgesToSuperview(edgeTypes.map { EdgeConstraint($0) })
+    }
+    
+    /// Pin edges of current view to the superview safe area
+    ///
+    /// ```
+    /// subview.pinEdgesToSafeArea([.init(.leading, offset: 20), .init(.trailing, offset: 20)])
+    /// ```
+    ///
+    /// - Parameter edges: array of edges which should be pinned. Pin all edges by default
     /// - Returns: current pinned view
     /// - Throws: Can throw Fatal error  if  superview not exists
     ///
     @discardableResult
     func pinEdgesToSafeArea(
-        _ edges: [Edge] = [.top(), .bottom(), .left(), .right()]
+        _ edges: [EdgeConstraint]
     ) -> UIView {
         guard let superview else {
             fatalError("View doesn't have superview")
         }
         
-        let safeAreaLayoutGuide = superview.safeAreaLayoutGuide
-        let constraints = edges.map {
-            switch $0 {
-            case let .top(offset, targetEdge):
-                let targetAnchor = targetEdge == .bottom ? safeAreaLayoutGuide.bottomAnchor : safeAreaLayoutGuide.topAnchor
-                let offset = targetEdge == .bottom ? offset : -offset
-                return topAnchor.constraint(
-                    equalTo: targetAnchor,
-                    constant: offset
-                )
-            case let .bottom(offset, targetEdge):
-                let targetAnchor = targetEdge == .top ? safeAreaLayoutGuide.topAnchor : safeAreaLayoutGuide.bottomAnchor
-                let offset = targetEdge == .top ? -offset : offset
-                return bottomAnchor.constraint(
-                    equalTo: targetAnchor,
-                    constant: offset
-                )
-            case let .left(offset, targetEdge):
-                let targetAnchor = targetEdge == .right ? safeAreaLayoutGuide.trailingAnchor : safeAreaLayoutGuide.leadingAnchor
-                let offset = targetEdge == .right ? offset : -offset
-                return leadingAnchor.constraint(
-                    equalTo: targetAnchor,
-                    constant: offset
-                )
-            case let .right(offset, targetEdge):
-                let targetAnchor = targetEdge == .left ? safeAreaLayoutGuide.leadingAnchor : safeAreaLayoutGuide.trailingAnchor
-                let offset = targetEdge == .left ? -offset : offset
-                return trailingAnchor.constraint(
-                    equalTo: targetAnchor,
-                    constant: offset
-                )
-            }
-        }
-        NSLayoutConstraint.activate(constraints)
-        
-        return self
+        return pinEdges(to: superview.safeAreaLayoutGuide, edges: edges)
+    }
+    
+    /// Pin edges of current view to the superview
+    ///
+    /// By default pin edge to the same edge of the safe area. For example left to left, top to top etc.
+    /// ```
+    /// subview.pinEdgesToSafeArea([.leading, .trailing])
+    /// ```
+    ///
+    /// - Parameter edges: array of edges which should be pinned. Pin all edges by default
+    /// - Returns: current pinned view
+    /// - Throws: Can throw Fatal error  if  superview not exists
+    ///
+    @discardableResult
+    func pinEdgesToSafeArea(
+        _ edgeTypes: [EdgeConstraint.EdgeType]
+    ) -> UIView {
+        pinEdgesToSafeArea(edgeTypes.map { EdgeConstraint($0) })
     }
 }
