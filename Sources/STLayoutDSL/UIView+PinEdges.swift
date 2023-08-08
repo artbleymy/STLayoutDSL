@@ -139,9 +139,41 @@ public extension UIView {
         guard let superview else {
             fatalError("View doesn't have superview")
         }
-        let safeArea = superview.safeAreaLayoutGuide.view(superview: superview)
-        safeArea.addSubview(self)
-        pinEdgesTo(safeArea, edges: edges.map { $0.inverted })
+        
+        let safeAreaLayoutGuide = superview.safeAreaLayoutGuide
+        let constraints = edges.map {
+            switch $0 {
+            case let .top(offset, targetEdge):
+                let targetAnchor = targetEdge == .bottom ? safeAreaLayoutGuide.bottomAnchor : safeAreaLayoutGuide.topAnchor
+                let offset = targetEdge == .bottom ? offset : -offset
+                return topAnchor.constraint(
+                    equalTo: targetAnchor,
+                    constant: offset
+                )
+            case let .bottom(offset, targetEdge):
+                let targetAnchor = targetEdge == .top ? safeAreaLayoutGuide.topAnchor : safeAreaLayoutGuide.bottomAnchor
+                let offset = targetEdge == .top ? -offset : offset
+                return bottomAnchor.constraint(
+                    equalTo: targetAnchor,
+                    constant: offset
+                )
+            case let .left(offset, targetEdge):
+                let targetAnchor = targetEdge == .right ? safeAreaLayoutGuide.trailingAnchor : safeAreaLayoutGuide.leadingAnchor
+                let offset = targetEdge == .right ? offset : -offset
+                return leadingAnchor.constraint(
+                    equalTo: targetAnchor,
+                    constant: offset
+                )
+            case let .right(offset, targetEdge):
+                let targetAnchor = targetEdge == .left ? safeAreaLayoutGuide.leadingAnchor : safeAreaLayoutGuide.trailingAnchor
+                let offset = targetEdge == .left ? -offset : offset
+                return trailingAnchor.constraint(
+                    equalTo: targetAnchor,
+                    constant: offset
+                )
+            }
+        }
+        NSLayoutConstraint.activate(constraints)
         
         return self
     }
