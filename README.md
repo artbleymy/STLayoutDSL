@@ -30,13 +30,13 @@ For adding to Xcode project:
     let firstSubview = UIView()
     view.addSubview(firstSubview)
     firstSubview
-        .pinEdgesToSuperview([.top(), .bottom(), .left(20), .right(20)])
+        .pinEdgesToSuperview([.init(.leading, inset: 30), .init(.trailing, inset: 30)])
 
     let secondSubview = UIView()
     view.addSubview(secondSubview)
     secondSubview
-        .pinEdgesToSuperview([.top(), .bottom()])
-        .pinEdgesTo(firstSubview, [.left(15), right(15)])
+        .pinEdgesToSuperview([.init(.leading, inset: 20), .init(.trailing, inset: 20)])
+        .pinEdgesToSafeArea([.top, .bottom])
 ```
 
 - Pin axes
@@ -44,7 +44,7 @@ For adding to Xcode project:
     let subview = UIView()
     view.addSubview(subview)
     subview
-        .pinAxesToSuperview([.horizontal(), .vertical(10)])
+        .pinAxesToSuperview([.init(.horizontal, offset: 100)])
 ```
 
 - Set size
@@ -60,9 +60,9 @@ For adding to Xcode project:
     let yellowView = colorView(color: .yellow)
     view.addSubview(yellowView)
     yellowView
-        .pinEdgesTo(blueView, edges: [.left(-30), .right(-40)])
+        .pinEdgesToSuperview([.init(.leading, inset: 30), .init(.trailing, inset: 30)])
         .setDimension([.height(70)])
-        .pinAxesToSuperview([.horizontal(100)])
+        .pinAxesToSuperview([.init(.horizontal, offset: 100)])
 ```
 
 ## License
